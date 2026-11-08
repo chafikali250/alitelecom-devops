@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AliTelecom - Portail Services</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>AliTelecom</h1>
+      <p>Plateforme de gestion de services télécom</p>
+    </header>
+    <main>
+      <section class="card">
+        <h2>Statut du Réseau</h2>
+        <button id="btn-check" onclick="checkStatus()">Vérifier le Statut API</button>
+        <div id="status-result">Attente d'action...</div>
+      </section>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

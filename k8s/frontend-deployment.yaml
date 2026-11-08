@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alitelecom-frontend
+  namespace: alitelecom
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: alitelecom-frontend
+  template:
+    metadata:
+      labels:
+        app: alitelecom-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: 466417121331.dkr.ecr.eu-west-3.amazonaws.com/alitelecom-frontend:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alitelecom-frontend-service
+  namespace: alitelecom
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: alitelecom-frontend

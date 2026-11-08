@@ -1,0 +1,50 @@
+name: CI/CD Pipeline AliTelecom
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Récupération du code
+      uses: actions/checkout@v3
+
+    - name: Configuration AWS
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-3
+
+    - name: Connexion à Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build & Push Frontend
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/alitelecom-frontend:$IMAGE_TAG ./frontend
+        docker tag $ECR_REGISTRY/alitelecom-frontend:$IMAGE_TAG $ECR_REGISTRY/alitelecom-frontend:latest
+        docker push $ECR_REGISTRY/alitelecom-frontend --all-tags
+
+    - name: Build & Push Backend
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/alitelecom-backend:$IMAGE_TAG ./backend
+        docker tag $ECR_REGISTRY/alitelecom-backend:$IMAGE_TAG $ECR_REGISTRY/alitelecom-backend:latest
+        docker push $ECR_REGISTRY/alitelecom-backend --all-tags
+
+    - name: Déploiement sur EKS
+      run: |
+        aws eks update-kubeconfig --region eu-west-3 --name alitelecom-cluster
+        kubectl apply -f k8s/namespace.yaml
+        kubectl apply -f k8s/ -n alitelecom
+        kubectl rollout restart deployment/alitelecom-frontend -n alitelecom
+        kubectl rollout restart deployment/alitelecom-backend -n alitelecom
