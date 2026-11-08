@@ -44,7 +44,7 @@ jobs:
 
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --namealitelecom-cluster --region eu-west-3
+          aws eks update-kubeconfig --name alitelecom-cluster --region eu-west-3
 
       - name: Restart Kubernetes deployments
         run: |
