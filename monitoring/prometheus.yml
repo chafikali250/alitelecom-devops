@@ -2,8 +2,6 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  - job_name: 'alitelecom-backend'
-    metrics_path: '/metrics'
+  - job_name: 'prometheus'
     static_configs:
-      # Remplacer par le DNS public ou l'IP de votre LoadBalancer/Ingress Kubernetes
-      - targets: ['<INGRESS_OR_LOADBALANCER_IP>:5000']
+      - targets: ['localhost:9090']
